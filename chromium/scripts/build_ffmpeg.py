@@ -36,7 +36,7 @@ ARCH_MAP = {
     'android': ['ia32', 'x64', 'mipsel', 'mips64el', 'arm-neon', 'arm64'],
     'linux': [
         'ia32', 'x64', 'mipsel', 'mips64el', 'noasm-x64', 'arm', 'arm-neon',
-        'arm64'
+        'arm64', 'ppc64'
     ],
     'mac': ['x64'],
     'win': ['ia32', 'x64', 'arm64'],
@@ -128,6 +128,8 @@ def DetermineHostOsAndArch():
     host_arch = 'mips64el'
   elif platform.machine().startswith('arm'):
     host_arch = 'arm'
+  elif platform.machine() == 'ppc64le':
+    host_arch = 'ppc64'
   else:
     return None
 
@@ -766,6 +768,11 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
             '--extra-cflags=--target=mips64el-linux-gnuabi64',
             '--extra-ldflags=--target=mips64el-linux-gnuabi64',
         ])
+    elif target_arch == 'ppc64':
+      configure_flags['Common'].extend([
+        '--arch=ppc64le',
+        '--extra-cflags=-mcpu=power9'
+      ])
     else:
       print(
           'Error: Unknown target arch %r for target OS %r!' % (target_arch,
@@ -791,7 +798,7 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
     # typically be the system one, so explicitly configure use of Clang's
     # ld.lld, to ensure that things like cross-compilation and LTO work.
     # This does not work for arm64, ia32 and is always used on mac.
-    if target_arch not in ['arm64', 'ia32', 'mipsel'] and target_os != 'mac':
+    if target_arch not in ['arm64', 'ia32', 'mipsel', 'ppc64'] and target_os != 'mac':
       configure_flags['Common'].append('--extra-ldflags=-fuse-ld=lld')
 
   # Should be run on Mac, unless we're cross-compiling on Linux.

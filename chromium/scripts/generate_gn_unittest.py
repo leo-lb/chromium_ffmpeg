@@ -322,6 +322,10 @@ class SourceSetUnittest(unittest.TestCase):
     f = SourceSet(
         set(['common', 'arm-neon', 'chrome', 'chromeos']),
         set([SourceListCondition('arm-neon', 'ChromeOS', 'linux')]))
+    g = SourceSet(
+        set(['common']),
+        set([SourceListCondition('ppc64', 'Chromium', 'linux')]))
+
 
     expected = set()
     expected.add(
@@ -333,7 +337,8 @@ class SourceSetUnittest(unittest.TestCase):
                 SourceListCondition('x64', 'Chromium', 'linux'),
                 SourceListCondition('x64', 'Chrome', 'linux'),
                 SourceListCondition('arm', 'Chromium', 'linux'),
-                SourceListCondition('arm-neon', 'ChromeOS', 'linux')
+                SourceListCondition('arm-neon', 'ChromeOS', 'linux'),
+                SourceListCondition('ppc64', 'Chromium', 'linux')
             ])))
     expected.add(
         SourceSet(
@@ -361,7 +366,7 @@ class SourceSetUnittest(unittest.TestCase):
             set(['arm-neon', 'chromeos']),
             set([SourceListCondition('arm-neon', 'ChromeOS', 'linux')])))
 
-    source_sets = gg.CreatePairwiseDisjointSets([a, b, c, d, e, f])
+    source_sets = gg.CreatePairwiseDisjointSets([a, b, c, d, e, f, g])
     self.assertEqualSets(expected, set(source_sets))
 
   def testReduceConditions(self):
@@ -376,6 +381,7 @@ class SourceSetUnittest(unittest.TestCase):
             SourceListCondition('arm-neon', 'Chromium', 'linux'),
             SourceListCondition('mipsel', 'Chromium', 'linux'),
             SourceListCondition('mips64el', 'Chromium', 'linux'),
+            SourceListCondition('ppc64', 'Chromium', 'linux'),
         ]))
     gg.ReduceConditionalLogic(a)
 
